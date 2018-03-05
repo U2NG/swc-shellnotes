@@ -1,0 +1,498 @@
+---
+title: "04_loops"
+author: "Reid Otsuji"
+date: "3/4/2018"
+output: html_document
+---
+
+# Lesson 4:  Loops
+* Write a loop that applies one or more commands separately to each file in a set of files.
+* Trace the values taken on by a loop variable cpduring execution of the loop.
+* Explain the difference between a variable’s name and its value.
+* Explain why spaces and some punctuation characters shouldn’t be used in file names.
+* Demonstrate how to see what commands have recently been executed.
+* Re-run recently executed commands without retyping them.
+
+
+Loops are key to productivity improvements through automation as they allow us to execute commands repetitively. 
+
+Similar to wildcards and tab completion, using loops also reduces the amount of typing (and typing mistakes). 
+
+For the next example, we are going to use the  **creatures** directory which only has two example files (basilisk.dat and unicorn.dat), but keep in mind, the principles can be applied to several files at once.
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+
+```bash
+cd creatures
+```
+
+    
+
+Navigate to **creatures** directory
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/creatures
+
+
+What we are going to do now is modify these 2 files, but also save a version of the original files, then naming the copies (original-basilisk.dat and original-unicorn.dat).
+
+As an example of what we can’t do to make a copy and rename is:
+
+
+```bash
+cp *.dat original-*.dat
+```
+
+    usage: cp [-R [-H | -L | -P]] [-fi | -n] [-apvX] source_file target_file
+           cp [-R [-H | -L | -P]] [-fi | -n] [-apvX] source_file ... target_directory
+
+
+**$ cp \*.dat original-\*.dat**
+	This expands to: 
+
+**$ cp basilisk.dat unicorn.dat original-\*.dat**
+
+	This command is a problem because it wouldn’t backup our files, instead we get an error:
+
+cp: target `original-*.dat' is not a directory
+
+This problem arises when cp receives more than two inputs. 
+
+When this happens, it expects the last input to be a directory where it can copy all the files it was passed. 
+
+Since there is no directory named original-*.dat in the creatures directory we get an error.
+
+
+```bash
+cp basilisk.dat unicorn.dat original-*.dat
+```
+
+    usage: cp [-R [-H | -L | -P]] [-fi | -n] [-apvX] source_file target_file
+           cp [-R [-H | -L | -P]] [-fi | -n] [-apvX] source_file ... target_directory
+
+
+What we can do is use a **Loop** to run an operation once for each item in a list to copy the files. 
+
+Here is a simple example of a loop that displays the first 3 lines of each file in turn:
+
+
+```bash
+for filename in basilisk.dat unicorn.dat
+do
+head -n 3 $filename
+done
+```
+
+    COMMON NAME: basilisk
+    CLASSIFICATION: basiliscus vulgaris
+    UPDATED: 1745-05-02
+    COMMON NAME: unicorn
+    CLASSIFICATION: equus monoceros
+    UPDATED: 1738-11-24
+
+
+Before I explain what the loop is doing, I want to point out the change in the shell prompt from $ to >  and back again as we were typing the loop. 
+
+The second prompt >,  is there to remind us that the command is not complete yet.  A semicolon, can be used to separate two commands written on a single line.
+
+Also, to exit an incomplete loop command use **control - c** to return to the prompt.
+
+Now, let me explain what the shell is doing.  
+
+
+When this loop is executed, the shell sees the keyword for, it knows it is supposed to repeat a command (or group of commands) once for each of the 2 items in the creatures folder in a list.
+
+Each time through the loop, the name of the thing currently being operated on is assigned to the variable called filename. Inside the loop, we get the variable’s value by putting $ in front of it: $filename is basilisk.dat the first time through the loop, unicorn.dat the second, and so on.
+
+using the dollar sign we are telling the shell interpreter to treat filename as a variable name and substitute its value on its place, but not as some text or external command. When using variables it is also possible to put the names into curly braces to clearly delimit the variable name: $filename is equivalent to ${filename}, but is different from ${file}name. You may find this notation in other people’s programs.
+
+Finally, the command that’s actually being run is our old friend head, so this loop prints out the first three lines of each data file in turn.
+
+Looking at the loop again, we have called the variable in this loop filename in order to make its purpose clearer to human readers. The shell itself doesn’t care what the variable is called; if we wrote this loop as:
+
+
+for x in basilisk.dat unicorn.dat
+do
+
+or 
+
+for temperature in basilisk.dat unicorn.dat
+do
+    head -n 3 $temperature
+done
+
+
+These examples would work the same, but now that I have shown you an example, **do not do this.** Other people need to understand the variables. 
+
+In this example, meaningless names (like x) or misleading names (like temperature) increase the odds that the program won’t do what its readers think it does.	
+
+### Challenge 5: Variables in Loops
+
+Let's write a more coplicated loop
+
+
+```bash
+For filename in *.dat
+do 
+echo $filename
+head -n 100 $filename | tail -n 20
+
+```
+
+    CGGTACCGAA
+    AAGGGTCGCG
+    CAAGTGTTCC
+    CGGGACAATA
+    GTTCTGCTAA
+    GATAAGTATG
+    TGCCGACTTA
+    CCCGACCGTC
+    TAGGTTATAA
+    GGCACAACCG
+    CTTCACTGTA
+    GAGGTGTACA
+    AGGATCCGTT
+    GCGCGGGCGG
+    CAGTCTATGT
+    TTTTCGACAC
+    TGGACTGCTT
+    CCCTTTGAGG
+    GTGGATTTTT
+    CGTAACGGGT
+
+
+The shell starts by expanding *.dat to create the list of files it will process. 
+
+The **loop body** then executes two commands for each of those files. 
+
+The first, echo, just prints its command-line parameters to standard output. For example if we typed:
+
+
+
+```bash
+echo hello there
+```
+
+    hello there
+
+
+The Shell will print: hello there
+
+In this case, since the shell expands $filename to be the name of a file, echo $filename just prints the name of the file. 
+
+Note that we can’t write this as:
+
+
+for filename in *.dat
+do
+    $filename
+    head -n 100 $filename | tail -n 20
+Done
+
+
+because then the first time through the loop, when $filename expanded to basilisk.dat, the shell would try to run basilisk.dat as a program. 
+
+Finally, the head and tail combination selects lines 81-100 from whatever file is being processed
+
+**Explain why spaces should not be used in filenames.**
+
+E.g. red dramgon.dat 
+
+for filename in *.dat<P>
+do<p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; head -n 100 $filename | tail -n 20 <p>
+done
+
+then the shell will expand *.dat to create:
+
+basilisk.dat red dragon.dat unicorn.dat
+
+With older versions of Bash, or most other shells, filename will then be assigned the following values in turn: the **space** will split the file name. 
+
+basilisk.dat
+
+red
+
+dragon.dat
+
+unicorn.dat
+
+That’s a problem: **head** can’t read files called **red** and **dragon.dat** because they don’t exist, and won’t be asked to read the file red dragon.dat.
+
+We can make our script a little bit more robust by **quoting** our use of the variable:
+
+**but it’s simpler just to avoid using spaces (or other special characters) in filenames**
+
+
+
+Going back to our original file copying problem, we can solve it using this loop:
+
+
+```bash
+for filename in *.dat
+do
+cp $filename original-$filename
+done
+```
+
+    
+
+
+```bash
+ls -F
+```
+
+    basilisk.dat		original-unicorn.dat
+    original-basilisk.dat	unicorn.dat
+
+
+This loop runs the **cp** command once for each filename. 
+
+The first time, when **$filename** expands to **basilisk.dat**, the shell executes:
+
+
+**cp basilisk.dat original-basilisk.dat**
+
+The second time, the command is:
+
+**cp unicorn.dat original-unicorn.dat**
+
+Loop flow chart example:  http://swcarpentry.github.io/shell-novice/fig/shell_script_for_loop_flow_chart.svg
+
+
+## Nelle’s Pipeline: Processing Files
+
+Let’s now think about our researcher, Nelle’s, Pipeline for processing files 
+
+Since she’s still learning how to use the shell, she decides to build up the required commands in stages. Her first step is to make sure that she can select the right files — remember, these are ones whose names end in ‘A’ or ‘B’, rather than ‘Z’. 
+
+Starting from her home directory, Nelle types:
+
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/creatures
+
+
+
+```bash
+cd ..
+```
+
+    
+
+
+```bash
+cd north-pacific-gyre/2012-07-03
+```
+
+    
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/north-pacific-gyre/2012-07-03
+
+
+
+```bash
+for datafile in *[AB].txt
+do
+echo $datafile
+done
+```
+
+    NENE01729A.txt
+    NENE01729B.txt
+    NENE01736A.txt
+    NENE01751A.txt
+    NENE01751B.txt
+    NENE01812A.txt
+    NENE01843A.txt
+    NENE01843B.txt
+    NENE01978A.txt
+    NENE01978B.txt
+    NENE02018B.txt
+    NENE02040A.txt
+    NENE02040B.txt
+    NENE02043A.txt
+    NENE02043B.txt
+
+
+Running this loop she now sees the output:
+
+	NENE01729A.txt
+	NENE01729B.txt
+	NENE01736A.txt
+	...
+	NENE02043A.txt
+	NENE02043B.txt
+
+
+Her next step is to decide what to call the files that the goostats analysis program will create. 
+
+Prefixing each input file’s name with “stats” seems simple, so she modifies her loop to do that:
+
+
+```bash
+for datafile in *[AB].txt
+do
+echo $datafile stats-$datafile
+done
+```
+
+    NENE01729A.txt stats-NENE01729A.txt
+    NENE01729B.txt stats-NENE01729B.txt
+    NENE01736A.txt stats-NENE01736A.txt
+    NENE01751A.txt stats-NENE01751A.txt
+    NENE01751B.txt stats-NENE01751B.txt
+    NENE01812A.txt stats-NENE01812A.txt
+    NENE01843A.txt stats-NENE01843A.txt
+    NENE01843B.txt stats-NENE01843B.txt
+    NENE01978A.txt stats-NENE01978A.txt
+    NENE01978B.txt stats-NENE01978B.txt
+    NENE02018B.txt stats-NENE02018B.txt
+    NENE02040A.txt stats-NENE02040A.txt
+    NENE02040B.txt stats-NENE02040B.txt
+    NENE02043A.txt stats-NENE02043A.txt
+    NENE02043B.txt stats-NENE02043B.txt
+
+
+The loop produces the output:
+
+	NENE01729A.txt stats-NENE01729A.txt
+	NENE01729B.txt stats-NENE01729B.txt
+	NENE01736A.txt stats-NENE01736A.txt
+	...
+	NENE02043A.txt stats-NENE02043A.txt
+	NENE02043B.txt stats-NENE02043B.txt
+
+
+She hasn’t actually run goostats yet, but now she’s sure she can select the right files and generate the right output filenames.
+
+Typing in commands over and over again is becoming tedious, though, and Nelle is worried about making mistakes, so instead of re-entering her loop, she presses the up arrow. 
+
+In response, the shell redisplays the whole loop on one line (using semi-colons to separate the pieces):
+
+
+
+```bash
+for datafile in *[AB].txt; do echo $datafile stats-$datafile; done
+```
+
+    NENE01729A.txt stats-NENE01729A.txt
+    NENE01729B.txt stats-NENE01729B.txt
+    NENE01736A.txt stats-NENE01736A.txt
+    NENE01751A.txt stats-NENE01751A.txt
+    NENE01751B.txt stats-NENE01751B.txt
+    NENE01812A.txt stats-NENE01812A.txt
+    NENE01843A.txt stats-NENE01843A.txt
+    NENE01843B.txt stats-NENE01843B.txt
+    NENE01978A.txt stats-NENE01978A.txt
+    NENE01978B.txt stats-NENE01978B.txt
+    NENE02018B.txt stats-NENE02018B.txt
+    NENE02040A.txt stats-NENE02040A.txt
+    NENE02040B.txt stats-NENE02040B.txt
+    NENE02043A.txt stats-NENE02043A.txt
+    NENE02043B.txt stats-NENE02043B.txt
+
+
+Using the left arrow key, Nelle backs up and changes the command echo to bash goostats:
+
+for datafile in \*[AB].txt; do bash goostats $datafile stats-$datafile; done
+
+When she presses Enter, the shell runs the modified command. However, nothing appears to happen — there is no output. 
+
+After a moment, Nelle realizes that since her script doesn’t print anything to the screen any longer, she has no idea whether it is running, much less how quickly. 
+
+She kills the running command by typing Ctrl-C, uses up-arrow to repeat the command, and edits it to read:
+
+
+
+```bash
+for datafile in *[AB].txt; 
+do echo $datafile; bash goostats $datafile stats-$datafile; done
+```
+
+    
+
+
+When she runs her program now, it produces one line of output every five seconds or so:
+
+	NENE01729A.txt
+	NENE01729B.txt
+	NENE01736A.txt
+	…
+1518 times 5 seconds, divided by 60, tells her that her script will take about two hours to run. 
+
+As a final check, she opens another terminal window, goes into north-pacific-gyre/2012-07-03, and uses cat stats-NENE01729B.txt to examine one of the output files. 
+
+
+It looks good, so she decides to get some coffee and catch up on her reading.
+
+
+
+```bash
+cat stats-NENE01729B.txt
+```
+
+    0.529201331561
+    0.646620295293
+    1.03149902331
+
+
+### Loop TIPS:
+
+History command
+Another way to repeat previous work is to use the history command to get a list of the last few hundred commands that have been executed, and then to use !123 (where “123” is replaced by the command number) to repeat one of those commands. For example, if Nelle types this:
+
+
+
+```bash
+history | tail -n 5
+```
+
+      906  for datafile in *[AB].txt; do echo $datafile; bash goostats $datafile stats-$datafile; done
+      907  for datafile in *[AB].txt; do echo $datafile; bash goostats $datafile stats-$datafile; done
+      908  $ history | tail -n 5
+      909  echo $?
+      910  history | tail -n 5
+
+
+## Challenge 6: Saving to a file in a Loop - Part One
+
+You are working with files in the same directory, what is the effect of this loop?
+
+```bash
+for sugar in *.dat
+do
+    echo $sugar
+    cat $sugar > xylose.dat
+done
+```
+
+
+
+1. Prints fructose.dat, glucose.dat, and sucrose.dat, and the text from sucrose.dat will be saved to a file called xylose.dat.
+
+2. Prints fructose.dat, glucose.dat, and sucrose.dat, and the text from all three files would be concatenated and saved to a file called xylose.dat.
+
+3. Prints fructose.dat, glucose.dat, sucrose.dat, and xylose.dat, and the text from sucrose.dat will be saved to a file called xylose.dat.
+
+4. None of the above.

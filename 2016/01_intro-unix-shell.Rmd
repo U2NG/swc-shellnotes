@@ -1,0 +1,539 @@
+---
+title: "01_intro-unix-shell"
+author: "Reid Otsuji"
+date: "3/4/2018"
+output: html_document
+---
+
+# Lecture Notes - Unix Shell
+
+* Introduce the day/syllabus
+* class website: 
+* SWC Code of Conduct
+* Explain post-its
+* Introduce Etherpad
+
+
+
+### Intro to Software Carpentry: http://swcarpentry.github.io/slideshows/introducing-software-carpentry/index.html#slide-0
+
+You need to download some files to follow this lesson:
+
+* Download <b>shell-novice-data.zip</b> and move the file to your Desktop.
+* Unzip/extract the file (ask your instructor if you need help with this step). You should end up with a new folder called data-shell on your Desktop. 
+* Create a new folder on your desktop called <b>SIO-SWC</b>
+* Move the <b> data-shell folder into the sio-swc folder </b>.
+* Open a terminal and type:
+
+
+
+```bash
+cd
+```
+
+    
+
+#### In the lesson, you will find out how to access the data in this folder.
+
+check to make sure data files have been installed to \\workshop\data-shell\
+
+Introducing the shell
+* The shell is a <b>command line interface</b>. 
+* The Shell uses text commands instead of a graphical interface.  
+* The heart of a <b>CLI is a read-evaluate-print loop, or REPL </b>: 
+* when the user types a command and then presses the enter (or return) key, the computer <b>reads it, executes it, and prints its output</b>. The user then types another command, and so on until the user logs off.
+
+* Commands are used in a program called a <b>command shell</b>. What your type goes into the shell, which then figures out what commands to run and orders the computer to execute them. Note, the shell is called the shell because it encloses the operating system in order to hide some of its complexity and make it simpler to interact with.
+
+* Importance of knowing how to use the Unix command shell the command line is often the easiest way to interact with remote machines and supercomputers. Familiarity with the shell is near essential to run a variety of specialised tools and resources including high-performance computing systems. As clusters and cloud computing systems become more popular for scientific data crunching, being able to interact with them is becoming a necessary skill.
+
+* Introduce Researcher Data: Nelle’s pipeline, Researcher data set and files used 
+
+
+<b>Introduce Researcher Data: Nelle’s pipeline </b>
+Researcher data set and files used 
+
+#### Nelle’s Pipeline: Starting Point
+Nelle Nemo, a marine biologist, has just returned from a six-month survey of the North Pacific Gyre, where she has been sampling gelatinous marine life in the Great Pacific Garbage Patch. She has 300 samples in all, and now needs to:
+* Run each sample through an assay machine that will measure the relative abundance of 300 different proteins. The machine’s output for a single sample is a file with one line for each protein.
+* Calculate statistics for each of the proteins separately using a program her supervisor wrote called <b>goostat</b>.
+* Compare the statistics for each protein with corresponding statistics for each other protein using a program one of the other graduate students wrote called goodiff.
+* Write up results. Her supervisor would really like her to do this by the end of the month so that her paper can appear in an upcoming special issue of Aquatic Goo Letters.
+
+It takes about half an hour for the assay machine to process each sample. The good news is that it only takes two minutes to set each one up. Since her lab has eight assay machines that she can use in parallel, this step will “only” take about two weeks.
+
+The bad news is that if she has to run goostat and goodiff by hand, she’ll have to enter filenames and click “OK” 45,150 times (300 runs ofgoostat, plus 300*299/2 (half of 300 times 299) runs of goodiff). At 30 seconds each, that will take more than two weeks. Not only would she miss her paper deadline, the chances of her typing all of those commands right are practically zero.
+
+The next few lessons will explore what she should do instead. More specifically, they explain how she can use a command shell to automate the repetitive steps in her processing pipeline so that her computer can work 24 hours a day while she writes her paper. As a bonus, once she has put a processing pipeline together, she will be able to use it again whenever she collects more data.
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji
+
+
+# Lesson 1:  Files and Directories Objectives
+* Explain the similarities and differences between a file and a directory.
+* Translate an absolute path into a relative path and vice versa.
+* Construct absolute and relative paths that identify specific files and directories.
+* Explain the steps in the shell’s read-run-print cycle.
+* Identify the actual command, flags, and filenames in a command-line call.
+* Demonstrate the use of tab completion, and explain its advantages.
+
+
+#### Lesson starts here:
+
+* The part of the operating system responsible for managing files and directories is called the file system. 
+
+* FS organizes our data into files, which hold information, and directories (also called “folders”), which hold files or other directories.
+
+* There are several commands are frequently used to create, inspect, rename, and delete files and directories. 
+
+* let’s take a look at the shell window and start exploring:
+
+
+Fist looking at the shell:
+** $ **
+
+* the dollar sign is a ** prompt **. All shell commands are typed after the prompt.  
+	
+Let’s start by typing: 
+
+
+
+```bash
+whoami
+```
+
+    rotsuji
+
+
+the Output is the ID of the current user, shows us who the shell thinks we are.
+
+what’s happening:
+* finds a program called ** whoami **,
+* runs that program,
+* displays that program’s output, then
+* displays a new prompt to tell us that it’s ready for more commands.
+
+Next, let’s find out where we are by running a command called:
+
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji
+
+
+Or <b>“print working directory”</b> which shows your current working directory. 
+
+The output you see is your **home directory.**
+
+
+Note: The directory path will look different on Windows ** Git Bash type example /c/Users/Reid or C:\documents and settings\Reid **
+
+#### Explain home directory:
+
+
+To understand what a “home directory” is, let’s have a look at how the file system as a whole is organized.
+
+* show file system image  http://swcarpentry.github.io/shell-novice/fig/filesystem.svg
+
+At the top is the **root directory** that holds everything else. We refer to it using a slash character / on its own; this is the leading slash in/Users/nelle.
+
+After this illustration, you’ll be learning commands to explore your own filesystem, which will be constructed in a similar way, but not be exactly identical.
+
+Inside that directory are several other directories: bin (which is where some built-in programs are stored), data (for miscellaneous data files), Users (where users’ personal directories are located), tmp (for temporary files that don’t need to be stored long-term), and so on.
+
+We know that our current working directory /Users/nelle is stored inside /Users because /Users is the first part of its name. Similarly, we know that /Users is stored inside the root directory / because its name begins with /.
+
+
+
+Typically, when you open a new command prompt you will be in your home directory to start.
+
+Now let’s learn the command that will let us see the contents of our own filesystem. We can see what’s in our home directory by running ls, which stands for “listing”:
+
+
+
+```bash
+ls
+```
+
+    Adlm				anaconda
+    Applications			backup-rstudio-desktop
+    Applications (Parallels)	data
+    Conferencing			data-carpentry
+    Creative Cloud Files		git_test
+    Desktop				libswc
+    Documents			my_project
+    Downloads			myprojects
+    Google Drive			pebble-dev
+    Google Drive MBPRO		planets
+    LibCarp-lesson-two.docx		planets-test
+    Library				sd-workshop
+    Movies				sio-swc
+    Music				stickies 5_2016.txt
+    My_R_projects			swCarpentry-shell-data
+    Pictures			swc_files
+    Public				to-do stickie.txt
+    README.md			todo - stickies .txt
+    USERNAME.github.com		vagrant_getting_started
+    VirtualBox VMs			vagrant_vms
+
+
+**ls** prints the names of the files and directories in the current directory in alphabetical order, arranged neatly into columns. 
+
+We can make its output more comprehensible by using the **flag -F**, which tells **ls to add a trailing / to the names of directories:**
+
+
+```bash
+ls -F
+```
+
+    Adlm/				anaconda/
+    Applications/			backup-rstudio-desktop/
+    Applications (Parallels)/	data/
+    Conferencing/			data-carpentry/
+    Creative Cloud Files/		git_test/
+    Desktop/			libswc/
+    Documents/			my_project/
+    Downloads/			myprojects/
+    Google Drive/			pebble-dev/
+    Google Drive MBPRO/		planets/
+    LibCarp-lesson-two.docx		planets-test/
+    Library/			sd-workshop/
+    Movies/				sio-swc/
+    Music/				stickies 5_2016.txt
+    My_R_projects/			swCarpentry-shell-data/
+    Pictures/			swc_files/
+    Public/				to-do stickie.txt
+    README.md			todo - stickies .txt
+    USERNAME.github.com/		vagrant_getting_started/
+    VirtualBox VMs/			vagrant_vms/
+
+
+The forward slash after file names show directories that contain sub-directories
+
+We can also use **ls** to see the contents of a different directory. 
+
+Let’s take a look at our Desktop directory by running **ls -F Desktop**, i.e., the command ls with the **arguments -F and Desktop.** The second argument — the one without a leading dash — tells ls that we want a listing of something other than our current working directory:
+
+
+**ls** has lots of other options. To find out what they are, we can type:
+
+
+```bash
+ls --help
+```
+
+    ls: illegal option -- -
+    usage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]
+
+
+Introduce **man** help pages.
+
+Note: Windows Gitbash does not support man. use web search for information.
+
+To navigate through the man pages, you may use the **up and down arrow keys** to move line-by-line, or try the **“b” and spacebar keys to skip up and down by full page.** 
+
+**Quit the man pages by typing “q”.**
+
+
+
+```bash
+ls -F Desktop
+```
+
+    ANSM presentation FINAL Copies/
+    ConnectingtoLibraryserversinOSX.pdf
+    DSC_1742.JPG*
+    DSC_7135.JPG*
+    GoogleRefineCheatSheets.pdf
+    Introduction-to-OpenRefine-handout-CC-BY.pdf
+    LC-data/
+    Launcher.app@
+    MSFTFreeEbooks.txt
+    MyPDF.PDF
+    OpoenRefinetutorial.pdf
+    ParallelsDesktop-12.0.0-41273.dmg
+    Screen Shot 2016-09-07 at 2.15.01 PM.png
+    Screen Shot 2016-09-07 at 2.16.48 PM.png
+    Screen Shot 2016-09-07 at 2.25.50 PM.png
+    Screen Shot 2016-09-07 at 2.27.50 PM.png
+    Software carpentry stuff/
+    Travel Funding Request Form Calc_Rev2014.02.21.pdf
+    Ubuntu Linux 14.04 Desktop@
+    Unix Shell Lesson Images/
+    blender tutorial/
+    desktop items for review/
+    desktop stuff 5-2016/
+    libcarp-data-notes/
+    libcarp-data-notes - clean/
+    lifecycle__intestinal_parasites_1.png
+    lifecycle__intestinal_parasites_2.png
+    otsuji_reid.pdf
+    remy_on_trike.jpg
+    sio-swc/
+    slice.avi
+    workshop/
+    workshop_old/
+
+
+Your output should be a list of all the files and sub-directories on your Desktop, including the workshop/data-shell directory you setup before the lesson. Take a look at your Desktop to confirm that your output is accurate.
+
+As you may now see, using a bash shell is strongly dependent on the idea that your files are organized in an hierarchical file system.
+
+Now that we know the data-shell directory is located on our Desktop in the workshop folder, we can do two things.
+First, we can look at its contents, using the same strategy as before, passing a directory name to ls:
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji
+
+
+
+```bash
+ls -F Desktop/sio-swc/data-shell
+```
+
+    Desktop/		molecules/		pizza.cfg
+    creatures/		north-pacific-gyre/	solar.pdf
+    data/			notes.txt		writing/
+
+
+we can actually change our location to a different directory, so we are no longer located in our home directory.	
+
+The command to change locations is **cd** followed by a directory name to change our working directory. cd stands for “change directory”, which is a bit misleading: the command doesn’t change the directory, it changes the shell’s idea of what directory we are in.
+
+Let’s say we want to move to the **data directory** we saw above. We can use the following series of commands to get there:
+
+To start over from my home directory, you can use the command:
+
+
+```bash
+cd 
+```
+
+    
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji
+
+
+
+```bash
+cd desktop
+```
+
+    
+
+
+```bash
+cd sio-swc
+```
+
+    
+
+
+```bash
+cd data-shell
+```
+
+    
+
+These commands will move us from our home directory onto our Desktop, then into the workshop  directory then into data-shell directory, then into the data directory. cd doesn’t print anything, but if we run pwd after it, we can see that we are now in
+/desktop/sio-swc/data-shell/
+
+to check type:
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/Desktop/sio-swc/data-shell
+
+
+
+```bash
+ls -F
+```
+
+    Desktop/		molecules/		pizza.cfg
+    creatures/		north-pacific-gyre/	solar.pdf
+    data/			notes.txt		writing/
+
+
+Now We now know how to go down the directory tree: how do we go up? We might try the following:
+
+
+```bash
+cd data-shell
+```
+
+    bash: cd: data-shell: No such file or directory
+
+
+Error!   cd can only see sub-directories inside your current directory
+	Windows - no such file or directory cd
+    
+There is a shortcut in the shell to move up one directory level that looks like this:
+
+
+```bash
+cd ..
+```
+
+    
+
+.. is a special directory name meaning “the directory containing this one”, or more succinctly, the parent of the current directory. Sure enough, if we run pwd after running cd ..
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/Desktop/sio-swc
+
+
+The special or hidden directory .. doesn’t usually show up when we run ls. If we want to display it, we can give ls the -a flag:
+
+
+```bash
+ls -F -a
+```
+
+    ./		.DS_Store	README.md
+    ../		.git/		data-shell/
+
+
+-a stands for “show all”; it forces ls to show us file and directory names that begin with ., such as ..
+As you can see, it also displays another special directory that’s just called., which means “the current working directory”. It may seem redundant to have a name for it, but we’ll see some uses for it soon.
+
+These then, are the basic commands for navigating the filesystem on your computer: pwd, ls and cd. Let’s explore some variations on those commands. 
+
+What happens if you type cd on its own, without giving a directory?
+
+
+```bash
+cd
+```
+
+    
+
+How can you check what happened? pwd gives us the answer!
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji
+
+
+It turns out that cd without an argument will return you to your home directory, which is great if you’ve gotten lost in your own filesystem.
+
+Let’s try returning to the data directory from before. Last time, we used three commands, but we can actually string together the list of directories to move to data in one step:
+
+
+```bash
+cd desktop/sio-swc/data-shell
+```
+
+    
+
+Check that we’ve moved to the right place by running pwd and ls -F.
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+
+```bash
+ls -F
+```
+
+    Desktop/		molecules/		pizza.cfg
+    creatures/		north-pacific-gyre/	solar.pdf
+    data/			notes.txt		writing/
+
+
+ensure that we’re in the directory we expect
+
+**shortcuts:** The shell interprets the character ~ (tilde) at the start of a path to mean “the current user’s home directory”.  e.g. /c/Users/Reid
+Another shortcut is the - (dash) character. cd will translate - into the previous directory I was in, which is faster than having to remember, then type, the full path. 
+
+**The difference between cd .. and cd - is that the former brings you up, while the later brings you back.**
+
+#### Introduce Nelle's pipline Organizing files:
+
+lets look at the researcher's files:
+
+First, she creates a directory called north-pacific-gyre (to remind herself where the data came from). 
+Inside that, she creates a directory called 2012-07-03, which is the date she started processing the samples. She used to use names like conference-paper and revised-results, but she found them hard to understand after a couple of years. (The final straw was when she found herself creating a directory called revised-revised-results-3.)
+
+Each of her physical samples is labelled according to her lab’s convention with a unique ten-character ID, such as “NENE01729A”. 
+
+This is what she used in her collection log to record the location, time, depth, and other characteristics of the sample, so she decides to use it as part of each data file’s name. 
+
+Since the assay machine’s output is plain text, she will call her files NENE01729A.txt, NENE01812A.txt, and so on. All 1520 files will go into the same directory.
+
+
+Introduce tab completion while looking at Nelle's files:
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+
+```bash
+ls north-pacific-gyre/2012-07-03
+```
+
+    NENE01729A.txt	NENE01751B.txt	NENE01971Z.txt	NENE02040A.txt	NENE02043B.txt
+    NENE01729B.txt	NENE01812A.txt	NENE01978A.txt	NENE02040B.txt	goodiff
+    NENE01736A.txt	NENE01843A.txt	NENE01978B.txt	NENE02040Z.txt	goostats
+    NENE01751A.txt	NENE01843B.txt	NENE02018B.txt	NENE02043A.txt
+
+
+This is a lot to type, but we can let the shell do most of the work through what is called **tab completion.** If we types:
+
+**$ ls nor [TAB]**
+
+and then presses tab (the tab key on her keyboard), the shell automatically completes the directory name for us: $ ls north-pacific-gyre/ 
+
+**$ [Tab]**
+
+If we presses tab again, Bash will add 2012-07-03/ to the command, since it’s the only possible completion. 
+$ ls north-pacific-gyre/2012-07-03/
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/north-pacific-gyre/2012-07-03
+
+
+## CHALLENGE SET 1 - end of section
+
+http://swcarpentry.github.io/shell-novice/02-filedir/#absolute-vs-relative-paths

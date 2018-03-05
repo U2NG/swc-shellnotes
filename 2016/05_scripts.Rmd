@@ -1,0 +1,353 @@
+---
+title: "05_scripts"
+author: "Reid Otsuji"
+date: "3/4/2018"
+output: html_document
+---
+
+# Lesson 5: Shell Scripts
+
+* Write a shell script that runs a command or series of commands for a fixed set of files.
+* Run a shell script from the command line.
+* Write a shell script that operates on a set of files defined by the user on the command line.
+* Create pipelines that include shell scripts you, and others, have written.
+
+
+We are finally ready to see what makes the shell such a powerful programming environment. 
+
+We are going to take the commands we repeat frequently and save them in files so that we can re-run all those operations again later by typing a single command. 
+
+For historical reasons, a bunch of commands saved in a file is usually called a **shell script**, but make no mistake: these are actually small programs.
+
+Let’s start by going back to **molecules/** and putting the following line in the script file **middle.sh** we are going to create. 
+
+
+start by typing **pwd** to see our current working directory
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+Navigate to the **workshop/data-shell/molecules** folder
+
+
+```bash
+cd molecules
+```
+
+    
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/molecules
+
+
+let’s create the script file called **middle.sh** by using a text editor:
+
+```bash
+$ nano (or notepad) middle.sh
+
+```
+
+The command nano middle.sh opens the file middle.sh within the text editor “nano” (which runs within the shell). 
+
+If the file does not exist, it will be created. 
+
+We can use the text editor to directly edit the file. 
+
+note that Shell script files end in .sh 
+
+In the script file type the line:
+
+**head -15 octane.pdb | tail -5**
+
+
+This is a variation on the pipe we constructed earlier: it selects lines 11-15 of the file **octane.pdb.** 
+
+Remember, we are not running it as a command just yet: we are putting the commands in a file.
+
+now save the middle.sh file.  
+
+in nano save the file (using CTRL-O), and exit the text editor (using CTRL-X)
+
+Once we have saved the file, we can ask the shell to execute the commands it contains. Our shell is called **bash**, so we run the following command:
+
+
+```bash
+$ bash middle.sh
+```
+
+The script’s output is exactly what we would get if we ran that pipeline directly
+
+##### Variable in scripts
+
+Now, What if we want to select lines from an arbitrary file? 
+
+We could edit middle.sh each time to change the filename, but that would probably take longer than just retyping the command. 
+
+Instead, let’s edit ***middle.sh*** and replace ***octane.pdb*** with a special variable called ***$1:***
+
+
+*** to edit the script file type: ***
+
+```bash
+$ nano (or notepad) middle.sh
+
+```
+
+In the script file lets replace octane.pdb with the special variable ***$1***
+
+***head -15 "$1" | tail -5***
+
+Inside a shell script, ***$1*** basically means ***“the first filename (or other parameter) on the command line”.***  
+
+We put the ***$1*** inside of double-quotes in case the filename happens to contain any spaces. 
+
+as we know from the data management lecture best practices, do not use spaces in filenames.
+
+
+We can now run our script like this:
+
+```bash
+$ bash middle.sh octane.pdb
+```
+
+
+
+
+or on another file by typing:
+```bash
+$ bash middle.sh pentane.pdb
+```
+
+To enhance our script:
+We still need to edit **middle.sh** each time we want to adjust the range of lines, though. Let’s fix that by using the special variables ** \$2 and $3:**
+
+
+```bash
+$ nano (or notepad) middle.sh 
+```
+
+edit the file by **replacing -15 with “\$2” and -5 with “\$3”**
+
+
+
+
+modify the line to read:  **head "\$2" "\$1" | tail "\$3"**
+
+run the script by typing: 
+
+```bash
+$ bash middle.sh pentane.pdb -20 -5
+```
+
+
+
+Our script works,  but it may take the next person who reads middle.sh a moment to figure out what it does. 
+
+it is good practice to add some **comments** at the top of the script:
+
+open the script file again in the editor. 
+
+
+```bash
+$ nano (or notepad) middle.sh 
+```
+
+
+
+
+** A comment starts with a # character and runs to the end of the line. **
+
+type in the comment:
+
+** # Select lines from the middle of a file.**
+
+**# Usage: middle.sh filename -end_line -num_lines **
+
+The computer ignores comments, but they’re invaluable for helping people understand and use scripts.
+
+save the file. 
+
+
+
+#### Processing many files
+
+What if we want to process many files in a single pipeline? 
+
+For example, if we want to sort our .pdb files by length, we would type:
+
+check to make sure you are still in the molecules folder:
+
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/molecules
+
+
+
+```bash
+wc -l *.pdb | sort -n
+```
+
+           9 methane.pdb
+          12 ethane.pdb
+          15 propane.pdb
+          20 cubane.pdb
+          21 pentane.pdb
+          30 octane.pdb
+         107 total
+
+
+because **wc -l** lists the number of lines in the files (recall that **wc stands for ‘word count’**, adding the **-l flag means ‘count lines’** instead) and **sort -n sorts things numerically**. 
+
+We could put this in a file, but then it would only ever sort a list of**.pdb** files in the current directory. 
+
+If we want to be able to get a sorted list of other kinds of files, we need a way to get all those names into the script. We can’t use **\$1**, **\$2**, and so on because we don’t know how many files there are. 
+
+
+ Instead, we use the special variable **\$@**, which means, **“All of the command-line parameters to the shell script.”** We also should put **\$@** inside double-quotes to handle the case of parameters containing spaces **("\$@" is equivalent to "\$1" "\$2" …)**
+
+
+
+**create the script file sorted.sh**
+
+```bash
+$ nano sorted.sh
+```
+
+add the line: 
+
+**wc -l "\$@" | sort -n**
+
+Save the file.
+
+run the script:
+
+
+```bash
+$ bash sorted.sh *.pdb ../creatures/*.dat
+```
+
+
+
+We have two more things to do before we’re finished with our simple shell scripts. If you look at a script like the one we just created:
+
+
+```bash
+$ cat sorted.sh
+```
+cat will show:
+
+** wc -l "\$@" | sort -n **
+
+you can probably figure out what it does. On the other hand, if you look at this script with comments it makes more sense.  
+
+Let’s add a comment to the script:
+
+
+open sorted.sh in nano:
+```bash
+$ nano sorted.sh
+```
+
+Type the comment:
+
+**# List files sorted by number of lines.**
+
+
+run **cat** one more time:
+```bash
+$ cat sorted.sh
+```
+
+Now if you shared the scripted or can’t remember what it does, you don’t have to figure it out — the comment at the top tells you what it does. 
+
+A line or two of documentation like this make it much easier for other people (including your future self) to re-use your work. 
+
+The only caveat is that each time you modify the script, you should check that the comment is still accurate: an explanation that sends the reader in the wrong direction is worse than none at all.
+
+
+Suppose we have just run a series of commands that did something useful — for example, that created a graph we’d like to use in a paper. We’d like to be able to re-create the graph later if we need to, so we want to save the commands in a file. Instead of typing them in again (and potentially getting them wrong) we can do this:
+
+
+```bash
+history | tail -n 5 > redo-figure-3.sh
+```
+
+    
+
+The file redo-figure-3.sh now contains the last several commands we used:
+
+
+```bash
+cat redo-figure-3.sh
+```
+
+      945  pwd
+      946  echo $?
+      947  $ history | tail -n 5 > redo-figure-3.sh
+      948  echo $?
+      949  history | tail -n 5 > redo-figure-3.sh
+
+
+
+In practice, most people develop shell scripts by running commands at the shell prompt a few times to make sure they’re doing the right thing, then saving them in a file for re-use. 
+
+This style of work allows people to recycle what they discover about their data and their workflow with one call to **history** and a bit of editing to clean up the output and save it as a shell script.
+
+### Nelle's Pipeline: Creating a Script
+
+#### Scenario:
+
+An off-hand comment from her supervisor has made Nelle realize that she should have provided a couple of extra parameters to goostats when she processed her files. This might have been a disaster if she had done all the analysis by hand, but thanks to for loops, it will only take a couple of hours to re-do.
+
+But experience has taught her that if something needs to be done twice, it will probably need to be done a third or fourth time as well. She runs the editor and writes the following:
+
+
+```bash
+# Calculate reduced stats for data files at J = 100 c/bp.
+for datafile in "$@"
+do
+    echo $datafile
+    bash goostats -J 100 -r $datafile stats-$datafile
+done
+```
+
+(The parameters -J 100 and -r are the ones her supervisor said she should have used.) She saves this in a file called do-stats.sh so that she can now re-do the first stage of her analysis by typing:
+
+```bash
+$ bash do-stats.sh *[AB].txt
+```
+
+
+She can also do this:
+
+```bash
+$ bash do-stats.sh *[AB].txt | wc -l
+```
+
+so that the output is just the number of files processed rather than the names of the files that were processed.
+
+One thing to note about Nelle’s script is that it lets the person running it decide what files to process. She could have written it as:
+
+```bash
+# Calculate reduced stats for  A and Site B data files at J = 100 c/bp.
+for datafile in *[AB].txt
+do
+    echo $datafile
+    bash goostats -J 100 -r $datafile stats-$datafile
+done
+```
+
+The advantage is that this always selects the right files: she doesn’t have to remember to exclude the ‘Z’ files. The disadvantage is that it always selects just those files — she can’t run it on all files (including the ‘Z’ files), or on the ‘G’ or ‘H’ files her colleagues in Antarctica are producing, without editing the script. If she wanted to be more adventurous, she could modify her script to check for command-line parameters, and use \*[AB].txt if none were provided. Of course, this introduces another tradeoff between flexibility and complexity.

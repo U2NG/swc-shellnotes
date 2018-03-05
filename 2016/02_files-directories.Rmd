@@ -1,0 +1,422 @@
+---
+title: "02_file-directories"
+author: "Reid Otsuji"
+date: "3/4/2018"
+output: html_document
+---
+# Lesson 2:  Files and Directories Objectives
+
+* Create a directory hierarchy that matches a given diagram.
+* Create files in that hierarchy using an editor or by copying and renaming existing files.
+* Display the contents of a directory using the command line.
+* Delete specified files and/or directories.
+
+
+We now know how to explore files and directories, but how do we create them in the first place? Let’s go back to our **data-shell** directory
+	
+If you are not at your data-shell directory use the cd command:
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/north-pacific-gyre
+
+
+
+```bash
+cd ..
+```
+
+    
+
+now let’s check that we are in our data-shell directory and see what it contains:
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+
+```bash
+ls -F
+```
+
+    Desktop/		molecules/		pizza.cfg
+    creatures/		north-pacific-gyre/	solar.pdf
+    data/			notes.txt		writing/
+
+
+Let’s create a new directory called thesis using the command **mkdir thesis (which has no output):**
+
+
+```bash
+mkdir thesis
+```
+
+    
+
+As you might (or might not) guess from its name, mkdir means “make directory”. Since thesis is a relative path (i.e., doesn’t have a leading slash), 
+
+
+```bash
+ls -F
+```
+
+    Desktop/		north-pacific-gyre/	thesis/
+    creatures/		notes.txt		writing/
+    data/			pizza.cfg
+    molecules/		solar.pdf
+
+
+the new directory is created in the current working directory
+However, there’s nothing in it yet: 
+
+#### Advice:
+
+Complicated names of files and directories can make your life very painful when working on the command line. Here we provide a few useful tips for the names of your files from now on.
+
+* Don’t use whitespaces.
+
+White spaces can make a name more meaningful but since whitespace is used to break arguments on the command line is better to avoid them on name of files and directories. You can use - or _ instead of whitespace.
+
+* Don’t begin the name with -.
+
+Commands treat names starting with - as options.
+
+* Stay with letters, numbers, ., - and _.
+
+May of the others characters have an special meaning on the command line that we will learn during this lesson. Some will only make your command not work at all but for some of them you can even lose some data.
+
+If you need to refer to names of files or directories that have whitespace or another non-alphanumeric character you should put quotes around the name.
+
+
+
+```bash
+ls -F thesis
+```
+
+    
+
+shows no list because the directory is empty.
+
+Let’s create and add a file.  Let’s change our working directory to thesis using cd, then run a text editor called Nano to create a file called draft.txt:
+
+
+```bash
+cd thesis
+```
+
+    
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/thesis
+
+
+Run nano draft.txt to create draft.txt file
+
+**$ nano draft.txt**
+
+Windows users can run:notepad draft.txt or nano in gitbash
+
+**It’s not “publish or perish” anymore,
+	it’s “share and thrive”.**
+
+Let’s type in a few lines of text, mac users: use Control-O to write our data to disk:
+(Windows users save the txt file directly to the \\workshop\data-shell\thesis\ folder)
+
+Once our file is saved, we can use Control-X to quit the nano editor and return to the shell. (Unix documentation often uses the shorthand ^A to mean “control-A”.) nano doesn’t leave any output on the screen after it exits, 
+
+
+
+```bash
+ls
+```
+
+    draft.txt
+
+
+ls now shows that we have created a file called draft.txt:
+
+now, Let’s tidy up by running rm draft.txt:
+
+
+```bash
+rm draft.txt
+```
+
+    
+
+This command removes files (“rm” is short for “remove”). If we run ls again, its output is empty once more, which tells us that our file is gone:
+
+
+```bash
+ls
+```
+
+    
+
+the thesis directory is now empty.
+
+**Deletion note:**  The Unix shell doesn’t have a trash bin that we can recover deleted files from (though most graphical interfaces to Unix do). Instead, when we delete files, they are unhooked from the file system so that their storage space on disk can be recycled. Tools for finding and recovering deleted files do exist, but there’s no guarantee they’ll work in any particular situation, since the computer may recycle the file’s disk space right away. 
+
+* deleting is forever
+
+keep this in mind when deleting files in the Shell
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/thesis
+
+
+next, we are going to re-create that file in thesis folder again and then move up one directory to using cd ..:
+
+recreate file by typing
+
+
+**$ nano draft.txt or notepad draft.txt**
+
+type something in the txt file.
+double check the file has been created by typing **ls**
+
+
+```bash
+ls
+```
+
+    draft.txt
+
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell/thesis
+
+
+move up one directory by typing cd .. cd .
+
+
+```bash
+cd ..
+```
+
+    
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+If we try to remove the entire thesis directory using **rm thesis**, we get an error message:
+
+
+```bash
+rm thesis
+```
+
+    rm: thesis: is a directory
+
+
+rm: cannot remove `thesis': Is a directory
+
+This happens because rm only works on files, not directories. 
+
+The right command is **rmdir**, which is short for “remove directory”. 
+
+It doesn’t wrmdirpwdork yet either, though, because the directory we’re trying to remove isn’t empty:
+
+
+```bash
+rmdir thesis
+```
+
+    rmdir: thesis: Directory not empty
+
+
+rmdir: failed to remove `thesis': Directory not empty
+
+This little safety feature can save you a lot of grief, particularly if you are a bad typist. 
+
+To really get rid of thesis we must first delete the file draft.txt:
+
+
+```bash
+rm thesis/draft.txt
+```
+
+    
+
+The directory is now empty, so rmdir can delete it:
+
+
+```bash
+rmdir thesis
+```
+
+    
+
+the directory should now be deleted, we can double check by running
+
+
+```bash
+ls -F
+```
+
+    Desktop/		molecules/		pizza.cfg
+    creatures/		north-pacific-gyre/	solar.pdf
+    data/			notes.txt		writing/
+
+
+TIP: if you are sure you want to delete a directory and all it’s content you can use 
+
+$rm - r [directory name]
+
+**This removes everything in the directory, then the directory itself. If the directory contains sub-directories, rm -r does the same thing to them, and so on. It’s very handy, but can do a lot of damage if used without care.**
+
+once more, Let’s create that directory and file one more time. 
+
+(Note that this time we’re running nano with the path thesis/draft.txt, rather than going into the thesis directory and running nano on draft.txt there.)
+
+
+```bash
+pwd
+```
+
+    /Users/rotsuji/desktop/sio-swc/data-shell
+
+
+
+```bash
+mkdir thesis
+```
+
+    
+
+**$ nano (or notepad) thesis/draft.txt**
+
+
+```bash
+ls thesis
+```
+
+    draft.txt
+
+
+Since draft.txt  isn’t a particularly informative name, we are going to change the file’s name using **mv**, which is short for “move”
+
+**$ mv thesis/draft.txt thesis/quotes.txt**
+
+when we run the move command, the first parameter tells mv what we’re “moving”, while the second is where it’s to go. 
+
+In this case, we’re moving thesis/draft.txt to thesis/quotes.txt, which has the same effect as renaming the file.
+
+	let’s check to make sure the file was renamed. 
+
+
+```bash
+ls thesis
+```
+
+    quotes.txt
+
+
+Sure enough, ls shows us that thesis now contains one file called quotes.txt:
+
+**Caution:** One has to be careful when specifying the target file name, since mv will silently overwrite any existing file with the same name, which could lead to data loss. An additional flag, mv -i (or mv --interactive), can be used to make mv ask the user for confirmation before overwriting.
+
+
+Now let’s say we want to move the quotes.txt file into the current working directory.  We use mv once again, but this time we’ll just use the name of a directory as the second parameter to tell mv that we want to keep the filename, but put the file somewhere new. (This is why the command is called “move”.) In this case, the directory name we use is the special directory name . that we mentioned earlier..  
+
+
+
+```bash
+mv thesis/quotes.txt .
+```
+
+    
+
+The effect is to move the file from the directory it was in to the current working directory. ls now shows us that thesis is empty:
+
+
+```bash
+ls thesis
+```
+
+    
+
+Further, ls with a filename or directory name as a parameter only lists that file or directory. We can use this to see that quotes.txt is still in our current directory:
+
+
+```bash
+ls quotes.txt
+```
+
+    quotes.txt
+
+
+For the last part of this lesson we’ll be using the command **cp** to make a copy of a file.  
+
+The **cp** command works very much like **mv**, except it copies a file instead of moving it. 
+
+
+
+
+```bash
+cp quotes.txt thesis/quotations.txt
+```
+
+    
+
+We can check that it did the right thing using **ls** with two paths as parameters
+
+
+
+```bash
+ls quotes.txt thesis/quotations.txt
+```
+
+    quotes.txt		thesis/quotations.txt
+
+
+To prove that we made a copy, let’s delete the quotes.txt file in the current directory and then run that same ls again.
+
+
+```bash
+rm quotes.txt
+```
+
+    
+
+
+```bash
+ls quotes.txt thesis/quotations.txt
+```
+
+    ls: quotes.txt: No such file or directory
+    thesis/quotations.txt
+
+
+**Error: ls: cannot access quotes.txt: No such file or directory
+thesis/quotations.txt**
+
+This time it tells us that it can’t find quotes.txt in the current directory, but it does find the copy in thesis that we didn’t delete.
+
+## CHALLENGE SET 2 - end of section
+
+http://swcarpentry.github.io/shell-novice/03-create/#renaming-files
