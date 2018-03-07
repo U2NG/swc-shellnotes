@@ -27,7 +27,7 @@ You need to download some files to follow this lesson:
 
 
 
-```bash
+```{r, engine = 'bash', eval = FALSE}
 cd
 ```
 
@@ -67,7 +67,7 @@ The bad news is that if she has to run goostat and goodiff by hand, she’ll hav
 The next few lessons will explore what she should do instead. More specifically, they explain how she can use a command shell to automate the repetitive steps in her processing pipeline so that her computer can work 24 hours a day while she writes her paper. As a bonus, once she has put a processing pipeline together, she will be able to use it again whenever she collects more data.
 
 
-```bash
+```{r, engine = 'bash', eval = FALSE}
 pwd
 ```
 
@@ -103,11 +103,9 @@ Let’s start by typing:
 
 
 
-```bash
+```{r, engine = 'bash', eval = FALSE}
 whoami
 ```
-
-    rotsuji
 
 
 the Output is the ID of the current user, shows us who the shell thinks we are.
@@ -122,11 +120,9 @@ Next, let’s find out where we are by running a command called:
 
 
 
-```bash
+```{r, engine = 'bash', eval = FALSE}
 pwd
 ```
-
-    /Users/rotsuji
 
 
 Or <b>“print working directory”</b> which shows your current working directory. 

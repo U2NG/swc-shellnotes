@@ -5,6 +5,7 @@
 * class website: 
 * SWC Code of Conduct
 * Explain post-its
+* Introduce Etherpad
 
 
 
